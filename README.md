@@ -1,48 +1,76 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Desktop (JVM).
+# News Feed Simulator
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+## Fitur
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
-
-### Build and Run Android Application
-
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
-
-### Build and Run Desktop (JVM) Application
-
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
-
-### Build and Run iOS Application
-
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+| Fitur | Implementasi |
+|---|---|
+| Simulasi berita baru setiap 2 detik | `Flow` + `delay(2000)` di coroutine |
+| Filter berita berdasarkan kategori | `combine()` antara `_newsList` dan `_selectedCategory` |
+| Transform data ke format tampilan | `formattedNews: Flow<List<String>>` dengan `.map` |
+| Menyimpan jumlah berita yang dibaca | `readCount: StateFlow<Int>` |
+| Ambil detail berita secara async | `suspend fun fetchNewsDetail()` dipanggil di `LaunchedEffect` |
 
 ---
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+## Struktur Proyek
+
+```
+NewsFeedSimulator/
+├── composeApp/
+│   ├── build/
+│   ├── src/
+│   │   └── commonMain
+│   │       ├── composeResources
+│   │       ├── kotlin
+│   │       │   ├── com.memory.newsfeedsimulator
+│   │       │    │  ├── App.kt
+│   │       │    │  ├── Greeting
+│   │       │    │  ├── NewsFeedSimulator.kt   # Logic: Flow, StateFlow, Coroutines
+│   │       │    │  ├── Platform.kt
+│   │    └── commonTest
+│   │    └── iosMain
+│   │    └── jvmMain
+│   └── build.gradle.kts
+├── gradle
+├── iosApp
+└── README.md
+```
+## Cara Menjalankan
+
+### 1. Buka di Android Studio
+
+1. Buka **Android Studio**
+2. Klik **File → Open**
+3. Pilih folder `NewsFeedSimulator`
+4. Tunggu proses **Gradle Sync** selesai
+6. Pilih Running Device
+Di sebelah kanan layar terdapat panel Running Devices — di sinilah nanti tampilan aplikasi akan muncul setelah di-run. Pastikan sudah ada emulator atau device fisik yang terhubung.
+7. Pilih Konfigurasi & Run
+Di pojok kanan atas Android Studio:
+
+Pastikan konfigurasi yang dipilih adalah composeApp — ini yang menjalankan tampilan Compose kita
+Klik tombol ▶ Run (atau tekan Shift+F10)
+Tunggu beberapa detik, aplikasi akan muncul di panel Running Devices
+
+atau lewat terminal:
+
+```bash
+./gradlew installDebug
+```
+
+---
+
+## Cara Menggunakan Aplikasi
+
+1. **Tap ▶ Start** — simulator mulai generate berita baru setiap 2 detik
+2. **Pilih Kategori** — gunakan dropdown untuk filter berita (Teknologi / Olahraga / Musik / Semua)
+3. **Tap kartu berita** — detail berita diambil secara async (ada loading spinner sebentar)
+4. **Lihat counter** — "📖 Berita dibaca: X" di atas update otomatis setiap berita dibuka
+5. **Tap ⏹ Stop** — hentikan simulator kapan saja
+6. **Tap ↺ Reset** — hapus semua berita dan mulai ulang dari awal
+7. Simulator **berhenti otomatis** setelah menghasilkan 20 berita
+---
+
+## Lisensi
+
+Proyek ini dibuat untuk keperluan tugas pembelajaran Kotlin & Coroutines.
